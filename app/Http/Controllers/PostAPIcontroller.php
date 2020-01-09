@@ -13,10 +13,9 @@ class PostAPIcontroller extends Controller
     {
     	echo "api controller created";
 
-    	//$data = product::all();
+  
     	$data = new Post;
 
-    	//return $data;
     	$data->title = $request->input("title");
     	$data->description = $request->input("description");
     	$data->price = $request->input("price");
@@ -42,5 +41,14 @@ class PostAPIcontroller extends Controller
 
     	$data->save();
     	return response()->json($data);
+    }
+
+    public function delete(Request $req, $id)
+    {
+    	$data = Post::find($id);
+    	$data->delete();
+    	return response()->json($data);
+
+
     }
 }
