@@ -1,0 +1,177 @@
+DemoController.php   in controller 
+
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use DB;
+
+class DemoController extends Controller
+{
+    //
+    public function insert(Request $req)
+    {
+    	$usid = $req->input('uid');
+    	$uname = $req->input('uname');
+    	$age = $req->input('age');
+    	
+    	$data = array('uid'=>$usid,'uname'=>$uname, 'age'=>$age);
+
+    	DB::table('stud_info') ->insert($data);
+
+    	echo "record inserted.!!";
+    	 //$this->getData();
+    }
+
+    public function getData(Request $req)
+    {
+    	$data = DB::table('stud_info')->get();
+    	if (count($data) > 0) {
+    		return view('usershow',['data'=>$data]);
+    		
+    		echo "Data Retrieved.!!";
+
+    	}
+
+    }
+
+
+    public function delete($id)
+    {
+
+    	DB::table('stud_info')->where('uid',$id)->delete();
+ 		return redirect('usershow');   
+    	echo "Data Deleted.!!";
+
+    }
+
+   public function index()
+	{
+			$data = DB::select('select * from stud_info');
+			return view('usershow',['data'=>$data]);
+            //return view('stud_edit_view',['data'=>$data]);
+	}
+	public function show($id) 
+	{
+			$data = DB::select('select * from stud_info where uid = ?',[$id]);
+			return view('stud_update',['data'=>$data]);
+            //return redirect('usershow'); 
+			
+	}
+	public function update(Request $request,$id)
+	 {
+			$id = $request->input('uid');
+			$uname = $request->input('uname');
+			$age = $request->input('age');
+	
+            DB::update('update stud_info set uid = ?,uname=?,age=? where uid = ?',[$id,$uname,$age]);
+            return redirect('usershow')->with('success',' updated successfully');
+
+			
+		
+	}
+
+
+
+}
+
+
+
+stud_edit_view.php
+
+<html>
+   <head>
+      <title>View Student Records</title>
+   </head>
+   
+   <body>
+      
+      <table border = "1">
+         <tr>
+            <td>ID</td>
+            <td>Name</td>
+            <td>AGE</td>
+            <td>EDIT</td>
+         </tr>
+         @foreach ($data as $value)
+         <tr>
+            <td>{{ $value->uid }}</td>
+            <td>{{ $value->uname }}</td>
+            <td>{{ $value->age }}</td>
+            <td><a href = '/edit/{{ $value->uid }}'>Edit</a></td>
+         </tr>
+         @endforeach
+      </table>
+   </body>
+</html>
+
+
+
+
+
+usershow.blade.php
+
+<html>
+	<head>
+		<title>User Details</title>
+	</head>
+
+	<body>
+		<form action="{{url('/usershow')}}" method="POST">
+			{{csrf_field()}}
+			uid:<input type="text" name="uid"><br />
+			Name: <input type="text" name="uname"><br />
+			Age: <input type="text" name="age" ><br />
+			<input type="submit" value="Add">
+		</form>
+
+		<br />
+
+
+		<b>UID</b>&nbsp;<b>Name</b>&nbsp;<b>Age</b><br /> 
+		@foreach($data as $value)
+			{{($value->uid)}}&nbsp;
+			{{($value-> uname)}} &nbsp;
+			{{($value->age)}} &nbsp;
+			&nbsp;<button><a href = "/update/{{ $value->uid }}">Update</a></button>
+			&nbsp;<button><a href="/delete/{{ $value->uid }}">Delete</a></button>
+			&nbsp;	<br />	
+		@endforeach
+
+
+	</body>
+
+</html>
+
+
+stud_update.php
+
+<html>
+
+   <body>
+      <form action = "/update/<?php echo $data[0]->uid; ?>" method = "post">
+         <input type = "hidden" name = "uid" value = "<?php echo csrf_token(); ?>">
+      
+         
+         Name:<input type = 'text' name = 'uname' value = '<?php echo $data[0]->uname; ?>'/>
+               
+                  <input type = 'submit' value = "Update" />
+                  
+               
+      </form>
+   </body>
+</html>
+
+
+web.php
+
+Route::get('/usershow',"DemoController@getData");
+Route::post('/usershow',"DemoController@insert");
+Route::view('/DemoController',"DemoController@formSubmit");
+Route::get('/delete/{id}',"DemoController@delete");
+Route::post('/update/{id}',"DemoController@update");
+Route::get('/usershow','DemoController@index');
+Route::get('/update/{id}','DemoController@show');
+
+
