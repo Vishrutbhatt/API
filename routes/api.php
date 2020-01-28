@@ -18,7 +18,7 @@ use Illuminate\Http\Request;
 
 
 // for insert
-Route::post('/posts',"PostAPIcontroller@index");
+Route::post('/posts',"PostAPIcontroller@insert");
 
 
 // for fetching data

@@ -18,7 +18,7 @@ class DemoController extends Controller
     	
     	$data = array('uid'=>$usid,'uname'=>$uname, 'age'=>$age);
 
-    	DB::table('stud_info') ->insert($data);
+    	DB::table('stud_info')->insert($data);
 
     	echo "record inserted.!!";
     	 //$this->getData();
